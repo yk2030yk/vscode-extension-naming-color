@@ -3,7 +3,7 @@ const camelCase = require('camelcase')
 const colorNameList = require('color-name-list')
 
 /**
- * 実行の度に処理するのは無駄なので事前に出力colors.jsonに出力しておく
+ * 実行の度に処理するのは無駄なので事前にcolors.jsonに出力しておく
  * FIXME: 面倒いのでjsで作成する
  */
 const exportColorsJson = () => {
