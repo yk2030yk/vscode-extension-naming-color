@@ -1,36 +1,19 @@
-import * as vscode from "vscode";
-const rgb2hex = require("rgb2hex");
-import { extractColor } from "./validate";
-import { searchMatchColor, searchNearestColor } from "./colorName";
+import * as vscode from 'vscode'
 
-const hover = (code: string, name: string) => {
-  return new vscode.Hover(
-    new vscode.MarkdownString(`Recommend Color Name: ${code} => ${name}`)
-  );
-};
+import { NamingColorNameHoverProvider } from './extensions/NamingColorNameHoverProvider'
+import { Colors } from './types'
 
 export const activate = (context: vscode.ExtensionContext) => {
-  const disposable = vscode.languages.registerHoverProvider(
-    { language: "typescript", scheme: "file" },
-    {
-      provideHover(document: vscode.TextDocument, position: vscode.Position) {
-        const t = document.lineAt(position);
-        const fex = extractColor(t.text);
-        const c = rgb2hex(fex);
-        const name = searchMatchColor(c);
+  // FIXME: 独自定義の色設定を取得したい
+  const extendsColors: Colors =
+    vscode.workspace.getConfiguration('namingColors') || {}
 
-        if (name) return hover(fex, name);
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider(
+      { scheme: 'file' },
+      new NamingColorNameHoverProvider({})
+    )
+  )
+}
 
-        const a = searchNearestColor(fex);
-        if (a) return hover(fex, a);
-
-        return;
-      },
-    }
-  );
-
-  context.subscriptions.push(disposable);
-};
-
-// this method is called when your extension is deactivated
 export function deactivate() {}
