@@ -33,7 +33,7 @@
     "exportColorJson": "tsc -p ./ && node ./out/color/exportJson.js",
     "jest": "jest"
   },
-  "devDependencies": {
+  "dependencies": {
     "@types/jest": "^25.2.3",
     "@types/node": "^13.11.0",
     "@types/vscode": "^1.45.0",
@@ -54,7 +54,7 @@
     "typescript": "^3.8.3",
     "vscode-test": "^1.3.0"
   },
-  "dependencies": {},
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/yk2030yk/vscode-extension-naming-color"
