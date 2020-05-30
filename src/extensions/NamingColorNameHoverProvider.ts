@@ -1,15 +1,22 @@
 import * as vscode from 'vscode'
-const rgbHex = require('rgb2hex')
 
 import { extractColor } from '../color/extract'
-import { namingMatchName, namingNearestName } from '../color/naming'
+import { ColorNamer } from '../color/naming'
+import { Colors, NamedColor } from '../types'
 
-type NamedColor = {
-  origin: string
-  match: string
-  nearest: string
-}
+/**
+ * 定義済みのjsonファイルと独自定義した定義をマージする
+ */
+const colorsJson = require('../colors.json') as Colors
+const mergeColors = (extendsColors: Colors) =>
+  ({
+    ...colorsJson,
+    ...extendsColors,
+  } as Colors)
 
+/**
+ * ホバーに出力するメッセージ
+ */
 const createMessage = (namedColor: NamedColor) => {
   const name =
     namedColor.match === namedColor.nearest
@@ -20,6 +27,9 @@ const createMessage = (namedColor: NamedColor) => {
   return `[naming color] ${namedColor.origin}: ${name}`
 }
 
+/**
+ * メッセージをMarkdownStringの配列に変換する
+ */
 const createMarkdownStrings = (namedColors: NamedColor[]) =>
   namedColors.map((n) => {
     const ms = new vscode.MarkdownString(createMessage(n))
@@ -28,6 +38,12 @@ const createMarkdownStrings = (namedColors: NamedColor[]) =>
   })
 
 export class NamingColorNameHoverProvider implements vscode.HoverProvider {
+  private colors: Colors
+
+  constructor(extendsColors: Colors = {}) {
+    this.colors = mergeColors(extendsColors)
+  }
+
   public provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
@@ -40,11 +56,13 @@ export class NamingColorNameHoverProvider implements vscode.HoverProvider {
       return null
     }
 
-    const namedColors: NamedColor[] = colors.map((origin) => {
-      const hex = rgbHex(origin).hex
-      const match = namingMatchName(hex)
-      const nearest = namingNearestName(hex)
-      return { origin, match, nearest }
+    const namedColors: NamedColor[] = colors.map((color) => {
+      const colorNamer = new ColorNamer(color, this.colors)
+      return {
+        origin: colorNamer.origin,
+        match: colorNamer.matchName,
+        nearest: colorNamer.nearestName,
+      }
     })
 
     return new vscode.Hover(createMarkdownStrings(namedColors))

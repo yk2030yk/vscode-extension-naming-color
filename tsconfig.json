@@ -7,7 +7,7 @@
     "sourceMap": true,
     "rootDir": "src",
     "typeRoots": ["src/types"],
-    "types": ["jest"],
+    "types": ["node"],
     "resolveJsonModule": true,
     "strict": true
   },
